@@ -1,0 +1,114 @@
+<?php
+error_reporting(E_ERROR);
+header('Content-Type: application/json');
+if (!function_exists('getallheaders'))  {
+    function getallheaders()
+    {
+        if (!is_array($_SERVER)) {
+            return array();
+        }
+
+        $headers = array();
+        foreach ($_SERVER as $name => $value) {
+            if (substr($name, 0, 5) == 'HTTP_') {
+                $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
+            }
+        }
+        return $headers;
+    }
+}
+$headers = getallheaders();
+$body = json_decode(file_get_contents("php://input"), TRUE);
+
+include 'include/database_class.php';
+$db = new Database();
+/*
+
+$keys = array(array("id" => "verso", "key" => "12345"));
+if($_SERVER["HTTP_AUTHORIZATION"]) {
+
+    if (strpos($_SERVER["HTTP_AUTHORIZATION"], ':') !== false) {
+        list($id, $key) = explode(':', $_SERVER["HTTP_AUTHORIZATION"]);
+    } else {
+        echo "Bad Auth KEY";
+        die();
+    }
+
+    foreach ( $keys as $k ){
+        if(!$id == $k["id"] && $key == $k["key"]) {
+
+            echo "No MATCH!";
+            die();
+        }
+    }
+} else {
+    echo "NO HEADER KEY";
+}
+function isValidJSON($str) {
+    json_decode($str);
+    return json_last_error() == JSON_ERROR_NONE;
+}
+
+ */
+/* Output header */
+header('Content-type: application/json');
+
+function filterInput($parameter, $type) {
+   return filter_input($type, $parameter,  FILTER_SANITIZE_STRING);
+
+}
+function isJson($string) {
+   //json_decode($string);
+    return (json_last_error() == JSON_ERROR_NONE);
+}
+
+if($_SERVER['REQUEST_METHOD'] == "GET") {
+
+    //$table  = filterInput("table", INPUT_GET);
+    $json = $db->query("SELECT id, question, author,date from questions");
+    $json = $db->resultset();
+
+    /*
+    for($i = 0; $i< count($json); $i++ ){
+        $json[$i]["answer"] = json_decode($json[$i]["answer"]);
+    }
+    */
+
+
+
+} else if ($_SERVER['REQUEST_METHOD'] == "POST"){
+
+    if (isJson($body)) {
+
+        $db->query("INSERT INTO steptest (uid, steps) VALUES (:uid, :steps)");
+
+        $db->bind(':uid', $body["uid"]);
+        $db->bind(':steps', $body["steps"]);
+       //$db->bind(':date', $body["date"]);
+
+        $db->execute();
+
+        if ($db->lastInsertId()) {
+            $response["message"] = "Request Succesfull";
+            $response["code"] = 1;
+            http_response_code(200);
+        } else {
+            $response["message"] = "Request Fail";
+            $response["code"] = 0;
+            http_response_code(403);
+        }
+
+
+
+    } else {
+        $response["message"] = "Request Fail";
+        $response["code"] = 0;
+        http_response_code(403);
+    }
+        echo json_encode($response);
+
+
+}
+
+//var_dump($body);
+//print_r(getallheaders());

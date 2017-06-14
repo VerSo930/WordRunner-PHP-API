@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="570158be-1fe3-4d3c-94a8-ff5c674b59d3" name="api" url="http://api.vuta-alexandru.com">
+        <fileTransfer host="api.vuta-alexandru.com" port="21" rootFolder="/api.vuta-alexandru.com">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" />
+          </advancedOptions>
+          <option name="port" value="21" />
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
